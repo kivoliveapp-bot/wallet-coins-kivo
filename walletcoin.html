@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #f6f7fb;
+            font-family: Arial, sans-serif;
+            color: #222;
+        }
+
+        .wallet {
+            margin: 22px 12px 10px;
+            padding: 25px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #FFEEBD, #EFA17D);
+            color: black;
+        }
+
+        .title {
+            font-size: 18px;
+            opacity: .9;
+            color: #8A4801;
+        }
+
+        .balance {
+            font-size: 25px;
+            font-weight: bold;
+            margin: 15px 0 5px;
+        }
+
+        .coins {
+            opacity: .85;
+            font-size: 14px;
+            color: #8A4801;
+        }
+
+        .numbers {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .coin-image-box {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .payment-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 15px 12px;
+        }
+
+        .recharge-section { margin: 15px; }
+
+        .recharge-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .recharge-item {
+            background: white;
+            border-radius: 18px;
+            padding: 16px 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: .15s;
+        }
+
+
+
+        .coin-image {
+            width: 35px;
+            height: 35px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .coin-amount {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .coin-price {
+            font-size: 14px;
+            color: #EA45C6;
+            margin-top: 6px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,.20);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 22px;
+            padding: 22px;
+            text-align: center;
+        }
+
+        @keyframes modalShow {
+            from { transform: scale(.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        .confirm-card {
+            background: #f8f8f8;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .confirm-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 0;
+        }
+
+        .confirm-label {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .confirm-value {
+            font-size: 16px;
+            color: #FFC107;
+        }
+
+        .confirm-value2 {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-button {
+            flex: 1;
+            border: 0;
+            padding: 13px;
+            border-radius: 13px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background: #eeeeee;
+            color: #555;
+        }
+
+        .confirm-button {
+            background: linear-gradient(135deg, #FF0084, #6800CF);
+            color: white;
+        }
+
+        .modal-button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .purchase-status {
+            text-align: center;
+            margin: 12px 15px;
+            color: #f6f7fb;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .purchase-status:empty { display: none; }
+    </style>
+</head>
+
+<body>
+
+<div class="wallet">
+    <div class="title">
+        <div data-string="balance"></div>
+    </div>
+
+    <div class="numbers">
+        <div class="balance" id="balance">0</div>
+        <img src="coin.png" class="coin-image-box" alt="Coins">
+    </div>
+
+    <div class="coins">
+        <div data-string="coins"></div>
+    </div>
+</div>
+
+<div class="payment-title">
+    <div data-string="recharge1"></div>
+</div>
+
+<div id="rechargeSection" class="recharge-section">
+    <div class="recharge-options">
+
+        <div class="recharge-item"
+             onclick="selectRecharge(100, 0.99, 'kivo_coins_100_1')">
+            <img src="coin.png" class="coin-image" alt="Coins">
+            <div class="coin-amount">100 <span data-string="coins">Coins</span></div>
+            <div class="coin-price">$0.99</div>
+        </div>
+
+        <div class="recharge-item"
+             onclick="selectRecharge(500, 4.99, 'kivo_coins_500_2')">
+            <img src="coin.png" class="coin-image" alt="Coins">
+            <div class="coin-amount">500 <span data-string="coins">Coins</span></div>
+            <div class="coin-price">$4.99</div>
+        </div>
+
+        <div class="recharge-item"
+             onclick="selectRecharge(1000, 9.99, 'kivo_coins_1000_3')">
+            <img src="coin.png" class="coin-image" alt="Coins">
+            <div class="coin-amount">1000 <span data-string="coins">Coins</span></div>
+            <div class="coin-price">$9.99</div>
+        </div>
+
+        <div class="recharge-item"
+             onclick="selectRecharge(5000, 49.99, 'kivo_coins_5000_4')">
+            <img src="coin.png" class="coin-image" alt="Coins">
+            <div class="coin-amount">5000 <span data-string="coins">Coins</span></div>
+            <div class="coin-price">$49.99</div>
+        </div>
+
+        <div class="recharge-item"
+             onclick="selectRecharge(10000, 99.99, 'kivo_coins_10000_5')">
+            <img src="coin.png" class="coin-image" alt="Coins">
+            <div class="coin-amount">10000 <span data-string="coins">Coins</span></div>
+            <div class="coin-price">$99.99</div>
+        </div>
+
+        <div class="recharge-item"
+             onclick="selectRecharge(20000, 199.99, 'kivo_coins_20000_6')">
+            <img src="coin.png" class="coin-image" alt="Coins">
+            <div class="coin-amount">20000 <span data-string="coins">Coins</span></div>
+            <div class="coin-price">$199.99</div>
+        </div>
+
+    </div>
+</div>
+
+<div id="purchaseStatus" class="purchase-status"></div>
+
+<!-- CONFIRMATION WINDOW -->
+
+<div id="confirmModal" class="modal">
+    <div class="modal-box">
+
+        <div class="modal-title">
+            <div data-string="confirm"></div>
+        </div>
+
+        <div class="confirm-card">
+            <div class="confirm-row">
+                <span class="confirm-label">
+                    <span data-string="sizecoin"></span>
+                </span>
+                <span class="confirm-value" id="confirmCoins">0</span>
+            </div>
+
+            <div class="confirm-row">
+                <span class="confirm-label">
+                    <span data-string="amountprix"></span>
+                </span>
+                <span class="confirm-value2" id="confirmPrice">$0.00</span>
+            </div>
+        </div>
+
+        <div class="confirm-buttons">
+            <button class="modal-button cancel-button"
+                    id="cancelButton"
+                    onclick="closeConfirm()">
+                <span data-string="cancellation"></span>
+            </button>
+
+            <button class="modal-button confirm-button"
+                    id="confirmButton"
+                    onclick="confirmRecharge()">
+                <span data-string="confirm"></span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    /* BALANCE: update this from the trusted Firebase listener */
+
+    let balance = 0;
+
+    function setBalance(value) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number) || number < 0) {
+            return;
+        }
+
+        balance = number;
+        document.getElementById("balance").textContent =
+            balance.toLocaleString();
+    }
+
+    /* SELECTED PACKAGE */
+
+    let selectedCoins = 0;
+    let selectedPrice = 0;
+    let selectedProductId = "";
+    let purchaseStarting = false;
+
+    function selectRecharge(amount, price, productId) {
+        if (purchaseStarting) return;
+
+        selectedCoins = amount;
+        selectedPrice = price;
+        selectedProductId = productId;
+
+        document.getElementById("confirmCoins").textContent =
+            amount.toLocaleString();
+
+        document.getElementById("confirmPrice").textContent =
+            "$" + price.toFixed(2);
+
+        document.getElementById("confirmModal").style.display =
+            "flex";
+
+        setPurchaseStatus("");
+    }
+
+    function closeConfirm() {
+        if (purchaseStarting) return;
+
+        document.getElementById("confirmModal").style.display =
+            "none";
+    }
+
+    /* GOOGLE PLAY BILLING BRIDGE */
+
+    function confirmRecharge() {
+closeConfirm();
+        if (purchaseStarting) return;
+
+        if (!selectedProductId) {
+            setPurchaseStatus("يرجى اختيار باقة الشحن أولاً.");
+            return;
+        }
+
+        if (
+            !window.KivoBilling ||
+            typeof window.KivoBilling.startPurchase !== "function"
+        ) {
+            setPurchaseStatus(
+                "نظام Google Play غير مربوط. تحقق من WebActivity.java."
+            );
+            return;
+        }
+
+        purchaseStarting = true;
+        document.getElementById("confirmButton").disabled = true;
+        document.getElementById("cancelButton").disabled = true;
+
+        setPurchaseStatus("جارٍ فتح Google Play...");
+
+        try {
+            window.KivoBilling.startPurchase(selectedProductId);
+        } catch (error) {
+            purchaseStarting = false;
+
+            document.getElementById("confirmButton").disabled = false;
+            document.getElementById("cancelButton").disabled = false;
+
+            setPurchaseStatus("تعذر بدء الشراء. حاول مجدداً.");
+        }
+    }
+
+    /* CALLED BY JAVA */
+
+    function purchaseStatus(message) {
+        purchaseStarting = false;
+
+        document.getElementById("confirmButton").disabled = false;
+        document.getElementById("cancelButton").disabled = false;
+
+        setPurchaseStatus(message || "");
+    }
+
+    function setPurchaseStatus(message) {
+        document.getElementById("purchaseStatus").textContent =
+            message || "";
+    }
+
+    /* CLOSE MODAL WHEN TAPPING OUTSIDE */
+
+    document.getElementById("confirmModal").addEventListener(
+        "click",
+        function(event) {
+            if (event.target === this && !purchaseStarting) {
+                closeConfirm();
+            }
+        }
+    );
+
+    window.onload = function() {
+        setBalance(balance);
+        applyStrings();
+    };
+
+    /* TRANSLATIONS */
+
+    function applyStrings() {
+        const lang = (navigator.language || "en")
+            .split("-")[0]
+            .toLowerCase();
+
+        if (typeof strings === "undefined") return;
+
+        document.querySelectorAll("[data-string]").forEach(element => {
+            const key = element.getAttribute("data-string");
+
+            const value =
+                (strings[lang] && strings[lang][key]) ||
+                (strings.en && strings.en[key]);
+
+            if (value) {
+                element.textContent = value;
+            }
+        });
+    }
+</script>
+
+<script src="strings-wallet-coins.js" onload="applyStrings()"></script>
+
+</body>
+</html>
